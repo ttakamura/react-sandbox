@@ -24,6 +24,8 @@ class Todo extends React.Component {
     render () {
         const task    = this.props.task;
         const editing = this.state.editing;
+        const toggle  = task.done ? <span>[x]</span> : <span>[ ]</span>;
+
         if (editing) {
             return <li>
                 <input type="text"
@@ -31,8 +33,9 @@ class Todo extends React.Component {
                  onKeyPress={this.checkEnter} />
             </li>;
         }else{
-            return <li onClick={this.beginEdit}>
-                {task.title}
+            return <li>
+                <div onClick={this.toggleTodo}>{toggle}</div>
+                <div onClick={this.beginEdit}>{task.title}</div>
             </li>;
         }
     }
@@ -45,12 +48,15 @@ class Todo extends React.Component {
     beginEdit = () => {
         this.setState({editing: true});
     }
+    toggleTodo = () => {
+        this.props.toggleTodo(this.props.task);
+    }
 }
 
 const TodoList = (props) => (
     <ul>
       {props.tasks.map(task => (
-          <Todo task={task} key={task.id} onEdit={props.onEdit} />
+          <Todo task={task} key={task.id} onEdit={props.onEdit} toggleTodo={props.toggleTodo} />
       ))}
     </ul>
 );
@@ -61,10 +67,12 @@ class App extends React.Component {
         this.state = {
             tasks: [{
                 id: nextId(),
-                title: 'hello'
+                title: 'hello',
+                done: false
             },{
                 id: nextId(),
-                title: 'world'
+                title: 'world',
+                done: false
             }]
         };
     }
@@ -72,16 +80,25 @@ class App extends React.Component {
         return <div>
             <Header />
               <input type="button" onClick={this.addTask} value="Add Task" />
-              <TodoList tasks={this.state.tasks} onEdit={this.onEdit} />
+              <TodoList tasks={this.state.tasks} onEdit={this.onEdit} toggleTodo={this.toggleTodo} />
             </div>;
     }
     addTask = () => {
         this.setState({tasks: [
                 ...this.state.tasks, {
                     id: nextId(),
-                    title: 'new'
+                    title: 'new',
+                    done: false
                 }
         ]});
+    }
+    toggleTodo = (newTask) => {
+        this.state.tasks.forEach((task) => {
+            if (task.id == newTask.id) {
+                task.done = !task.done;
+            }
+        });
+        this.setState({tasks: this.state.tasks});
     }
     onEdit = (newTask) => {
         this.setState({tasks: this.state.tasks.map((task) => {
