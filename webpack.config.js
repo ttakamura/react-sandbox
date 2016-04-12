@@ -10,19 +10,21 @@ const PATHS = {
 };
 
 PATHS.app_index_simple_react = path.join(PATHS.app, 'simple_react', 'index.jsx');
+PATHS.app_index_redux        = path.join(PATHS.app, 'redux', 'index.jsx');
 
 process.env.BABEL_ENV = TARGET;
 
 const common = {
     entry: {
-        simple_react: PATHS.app_index_simple_react
+        simple_react: PATHS.app_index_simple_react,
+        redux: PATHS.app_index_redux
     },
     resolve: {
         extensions: ['', '.js', '.jsx']
     },
     output: {
         path: PATHS.build,
-        filename: 'bundle.js'
+        filename: '[name].bundle.js'
     },
     module: {
         loaders: [
