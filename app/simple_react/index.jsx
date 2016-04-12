@@ -2,11 +2,11 @@ require('./main.css');
 import React    from 'react';
 import ReactDOM from 'react-dom';
 
-let currentId = 0
+let currentId = 0;
 const nextId  = () => {
-    currentId += 1
+    currentId += 1;
     return currentId
-}
+};
 
 class Header extends React.Component {
     render () {
