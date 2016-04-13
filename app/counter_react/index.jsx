@@ -18,14 +18,14 @@ class App extends React.Component {
               <h1>React Counter App</h1>
               <hr />
               <CounterDisplay number={this.state.number} />
-              <IncrementButton onClick={() => this.increment()} />
+              <IncrementButton onClick={this.increment} />
               <hr />
               <Graph number={this.state.number} />
             </div>
         );
     }
-    increment() {
-        this.state.number += 1;
+    increment = (delta) => {
+        this.state.number += delta;
         this.setState(this.state);
     }
 }
@@ -35,7 +35,7 @@ class Graph extends React.Component {
         const style = {
             backgroundColor: 'blue',
             height: '100px',
-            width: this.props.number * 10
+            width: this.props.number
         };
         return (
             <div style={style}></div>
@@ -46,20 +46,36 @@ class Graph extends React.Component {
 class CounterDisplay extends React.Component {
     render () {
         return (
-            <h1><center>
+            <h1>
+              <center>
                 {this.props.number}
-              </center></h1>
+              </center>
+            </h1>
         );
     }
 }
 
 class IncrementButton extends React.Component {
+    constructor (props) {
+        super(props);
+        this.state = {delta: 1};
+    }
     render () {
         return (
+            <div>
             <input type="button"
-                   onClick={this.props.onClick}
-                   value="増やす" />
+                   onClick={() => this.props.onClick(this.state.delta)}
+                   value={`${this.state.delta} 増やす`} />
+            <input type="range"
+                   min="1"
+                   max="10"
+                   onClick={this.changeDelta} />
+            </div>
         );
+    }
+    changeDelta = (e) => {
+        this.state.delta = parseInt(e.target.value);
+        this.setState(this.state);
     }
 }
 
