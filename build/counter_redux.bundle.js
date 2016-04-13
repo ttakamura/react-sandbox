@@ -46,8 +46,6 @@
 
 	'use strict';
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -62,195 +60,14 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 	var currentId = 0;
 	var nextId = function nextId() {
 	    currentId += 1;
 	    return currentId;
 	};
 
-	// actions ------------------------------------------------------
-	var addTask = function addTask(title) {
-	    return {
-	        type: 'ADD_TASK',
-	        id: nextId(),
-	        title: title
-	    };
-	};
-
-	var enterEdit = function enterEdit(id) {
-	    return {
-	        type: 'EDIT_TASK',
-	        id: id
-	    };
-	};
-
-	var finishEdit = function finishEdit(id) {
-	    return {
-	        type: 'FINISH_EDIT_TASK',
-	        id: id
-	    };
-	};
-
-	// reducers -----------------------------------------------------
-	var taskReducer = function taskReducer(state, action) {
-	    switch (action.type) {
-	        case 'EDIT_TASK':
-	            var flag = !state.editing;
-	            return _extends({}, state, {
-	                editing: flag
-	            });
-	        default:
-	            return state;
-	    }
-	};
-
-	var tasksReducer = function tasksReducer() {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
-	    var action = arguments[1];
-
-	    switch (action.type) {
-	        case 'ADD_TASK':
-	            var newTask = {
-	                id: action.id,
-	                title: action.title,
-	                editing: false,
-	                done: false
-	            };
-	            return [].concat(_toConsumableArray(state), [newTask]);
-	        case ('EDIT_TASK', 'FINISH_EDIT_TASK'):
-	            return state.map(function (task) {
-	                if (action.id === task.id) {
-	                    return taskReducer(task, action);
-	                } else {
-	                    return task;
-	                }
-	            });
-	        default:
-	            return state;
-	    }
-	};
-
-	var todoAppReducer = (0, _redux.combineReducers)({
-	    tasks: tasksReducer
-	});
-
-	// components ----------------------------------------------------
-	var AddTodoButton = function AddTodoButton(_ref) {
-	    var onClick = _ref.onClick;
-
-	    return _react2.default.createElement('input', { type: 'button', onClick: onClick, value: 'Add Task' });
-	};
-
-	var TodoView = function TodoView(_ref2) {
-	    var task = _ref2.task;
-	    var onEdit = _ref2.onEdit;
-	    var _onKeyPress = _ref2.onKeyPress;
-	    var toggleTodo = _ref2.toggleTodo;
-
-	    if (task.editing) {
-	        return _react2.default.createElement(
-	            'li',
-	            { id: 'todo-{task.id}' },
-	            _react2.default.createElement('input', { type: 'text',
-	                defaultValue: task.title,
-	                onKeyPress: function onKeyPress(e) {
-	                    return _onKeyPress(task.id, e);
-	                } })
-	        );
-	    } else {
-	        return _react2.default.createElement(
-	            'li',
-	            { id: 'todo-{task.id}' },
-	            _react2.default.createElement(
-	                'div',
-	                { onClick: function onClick() {
-	                        return toggleTodo(task.id);
-	                    } },
-	                '[ ]'
-	            ),
-	            _react2.default.createElement(
-	                'div',
-	                { onClick: function onClick() {
-	                        return onEdit(task.id);
-	                    } },
-	                task.title
-	            )
-	        );
-	    }
-	};
-
-	var TodoListView = function TodoListView(_ref3) {
-	    var tasks = _ref3.tasks;
-
-	    return _react2.default.createElement(
-	        'ul',
-	        null,
-	        tasks.map(function (task) {
-	            return _react2.default.createElement(Todo, { key: task.id,
-	                task: task });
-	        })
-	    );
-	};
-
-	var App = function App() {
-	    return _react2.default.createElement(
-	        'div',
-	        null,
-	        _react2.default.createElement(AddTodo, null),
-	        _react2.default.createElement(TodoList, null)
-	    );
-	};
-
-	// containers ----------------------------------------------------
-	var AddTodo = (0, _reactRedux.connect)(null, function (dispatch) {
-	    return {
-	        onClick: function onClick() {
-	            dispatch(addTask('new task'));
-	        }
-	    };
-	})(AddTodoButton);
-
-	var Todo = (0, _reactRedux.connect)(null, function (dispatch) {
-	    return {
-	        onEdit: function onEdit(id) {
-	            dispatch(enterEdit(id));
-	        },
-	        onKeyPress: function onKeyPress(id, e) {
-	            if (e.key === 'Enter') {
-	                dispatch(finishEdit(id));
-	            }
-	        },
-	        toggleTodo: function toggleTodo(id) {
-	            console.log("toggleTodo");
-	        }
-	    };
-	})(TodoView);
-
-	var TodoList = (0, _reactRedux.connect)(function (state) {
-	    return {
-	        tasks: state.tasks
-	    };
-	}, null)(TodoListView);
-
-	// main ----------------------------------------------------------
-	window.setupSimpleReduxApp = function () {
-
-	    var store = (0, _redux.createStore)(todoAppReducer);
-
-	    var unsubscribe = store.subscribe(function () {
-	        console.log(store.getState());
-	    });
-	    store.dispatch(addTask('hello'));
-	    store.dispatch(addTask('world'));
-	    unsubscribe();
-
-	    _reactDom2.default.render(_react2.default.createElement(
-	        _reactRedux.Provider,
-	        { store: store },
-	        _react2.default.createElement(App, null)
-	    ), document.getElementById('app'));
+	var render = function render() {
+	    _reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('app'));
 	};
 
 /***/ },

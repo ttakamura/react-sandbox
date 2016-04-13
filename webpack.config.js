@@ -6,19 +6,19 @@ const TARGET           = process.env.npm_lifecycle_event;
 
 const PATHS = {
     app: path.join(__dirname, 'app'),
-    build: path.join(__dirname, 'build')
+    build: path.join(__dirname, 'build'),
+    entry: {}
 };
 
-PATHS.app_index_simple_react = path.join(PATHS.app, 'simple_react', 'index.jsx');
-PATHS.app_index_redux        = path.join(PATHS.app, 'redux', 'index.jsx');
+PATHS.entry.simple_react  = path.join(PATHS.app, 'simple_react',  'index.jsx');
+PATHS.entry.redux         = path.join(PATHS.app, 'redux',         'index.jsx');
+PATHS.entry.counter_redux = path.join(PATHS.app, 'counter_redux', 'index.jsx');
+PATHS.entry.counter_react = path.join(PATHS.app, 'counter_react', 'index.jsx');
 
 process.env.BABEL_ENV = TARGET;
 
 const common = {
-    entry: {
-        simple_react: PATHS.app_index_simple_react,
-        redux: PATHS.app_index_redux
-    },
+    entry: PATHS.entry,
     resolve: {
         extensions: ['', '.js', '.jsx']
     },
