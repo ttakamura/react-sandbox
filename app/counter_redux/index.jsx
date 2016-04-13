@@ -10,34 +10,27 @@ const nextId  = () => {
 };
 
 class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {number: 0};
-    }
     render() {
         return (
             <div>
               <h1>React Counter App</h1>
               <hr />
-              <CounterDisplay number={this.state.number} />
-              <IncrementButton onClick={this.increment} />
+              <CounterDisplay />
+              <IncrementButton />
               <hr />
-              <Graph number={this.state.number} />
+              <Graph />
             </div>
         );
-    }
-    increment = (delta) => {
-        this.state.number += delta;
-        this.setState(this.state);
     }
 }
 
 class Graph extends React.Component {
     render () {
+        const number = store.getState().number;
         const style = {
             backgroundColor: 'blue',
             height: '100px',
-            width: this.props.number
+            width: number
         };
         return (
             <div style={style}></div>
@@ -47,10 +40,11 @@ class Graph extends React.Component {
 
 class CounterDisplay extends React.Component {
     render () {
+        const number = store.getState().number;
         return (
             <h1>
               <center>
-                {this.props.number}
+                {number}
               </center>
             </h1>
         );
@@ -58,26 +52,19 @@ class CounterDisplay extends React.Component {
 }
 
 class IncrementButton extends React.Component {
-    constructor (props) {
-        super(props);
-        this.state = {delta: 1};
-    }
     render () {
+        const delta = store.getState().delta;
         return (
             <div>
             <input type="button"
-                   onClick={() => this.props.onClick(this.state.delta)}
-                   value={`${this.state.delta} 増やす`} />
+                   onClick={() => store.dispatch(incrementAction(delta))}
+                   value={`${delta} 増やす`} />
             <input type="range"
                    min="1"
                    max="10"
-                   onClick={this.changeDelta} />
+                   onClick={(e) => store.dispatch(changeDelta(e.target.value))} />
             </div>
         );
-    }
-    changeDelta = (e) => {
-        this.state.delta = parseInt(e.target.value);
-        this.setState(this.state);
     }
 }
 
@@ -87,5 +74,53 @@ const render = () => {
         document.getElementById('app')
     );
 };
+
+
+// Redux --------------------------------------------------
+const clone = (value) => {
+    return JSON.parse(JSON.stringify(value));
+};
+
+const changeDelta = (delta) => {
+    return {
+        type: 'CHANGE_DELTA',
+        delta: parseInt(delta)
+    };
+};
+
+const incrementAction = (delta) => {
+    return {
+        type: 'INCR_NUMBER',
+        delta: delta
+    };
+};
+
+const initialiState = {
+    number: 0,
+    delta: 1
+};
+
+const appReducer = (state=initialiState, action) => {
+    let newState = clone(state);
+
+    switch (action.type) {
+    case 'INCR_NUMBER':
+        newState.number = state.number + action.delta;
+        return newState;
+    case 'CHANGE_DELTA':
+        newState.delta = action.delta;
+        return newState;
+    default:
+        return state;
+    }
+};
+
+let store = createStore(appReducer);
+
+store.subscribe(render);
+store.subscribe(() => console.log(store.getState()));
+
+// store.dispatch(incrementAction(1));
+// store.dispatch(incrementAction(1));
 
 render();
