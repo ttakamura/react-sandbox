@@ -1,7 +1,7 @@
 import React                            from 'react';
 import ReactDOM                         from 'react-dom';
 import { combineReducers, createStore } from 'redux';
-// import { Provider, connect }         from 'react-redux';
+import { Provider, connect }            from 'react-redux';
 
 let currentId = 0;
 const nextId  = () => {
@@ -22,29 +22,27 @@ class App extends React.Component {
             </div>
         );
     }
-}
+};
 
 class Graph extends React.Component {
-    render () {
-        const number = store.getState().number;
+    render() {
         const style = {
             backgroundColor: 'blue',
             height: '100px',
-            width: number
+            width: this.props.number
         };
         return (
             <div style={style}></div>
         );
     }
-}
+};
 
 class CounterDisplay extends React.Component {
     render () {
-        const number = store.getState().number;
         return (
             <h1>
               <center>
-                {number}
+                {this.props.number}
               </center>
             </h1>
         );
@@ -53,16 +51,15 @@ class CounterDisplay extends React.Component {
 
 class IncrementButton extends React.Component {
     render () {
-        const delta = store.getState().delta;
         return (
             <div>
             <input type="button"
-                   onClick={() => store.dispatch(incrementAction(delta))}
-                   value={`${delta} 増やす`} />
+                   onClick={() => this.props.increment(this.props.delta)}
+                   value={`${this.props.delta} 増やす`} />
             <input type="range"
                    min="1"
                    max="10"
-                   onClick={(e) => store.dispatch(changeDelta(e.target.value))} />
+                   onClick={this.props.changeDelta} />
             </div>
         );
     }
@@ -70,7 +67,9 @@ class IncrementButton extends React.Component {
 
 const render = () => {
     ReactDOM.render(
-        <App />,
+        <Provider store={store}>
+          <App />
+        </Provider>,
         document.getElementById('app')
     );
 };
@@ -115,12 +114,36 @@ const appReducer = (state=initialiState, action) => {
     }
 };
 
+Graph = connect(
+    (state) => {
+        return {number: state.number};
+    }
+)(Graph);
+
+CounterDisplay = connect(
+    (state) => {
+        return {number: state.number};
+    }
+)(CounterDisplay);
+
+IncrementButton = connect(
+    (state) => {
+        return {delta: state.delta};
+    },
+    (dispatch) => {
+        return {
+            increment: (delta) => dispatch(incrementAction(delta)),
+            changeDelta: (e) => dispatch(changeDelta(e.target.value))
+        };
+    }
+)(IncrementButton);
+
 let store = createStore(appReducer);
 
 store.subscribe(render);
 store.subscribe(() => console.log(store.getState()));
 
-// store.dispatch(incrementAction(1));
-// store.dispatch(incrementAction(1));
+store.dispatch(incrementAction(1));
+store.dispatch(incrementAction(1));
 
 render();
